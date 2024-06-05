@@ -43,7 +43,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const card = cards.pop();
       const cardElement = document.createElement("div");
       cardElement.classList.add("card");
-      cardElement.textContent = `${card.name.ko} (HP: ${card.hp}, LV: ${card.level})`;
+      cardElement.innerHTML = `
+        <div>${card.name.ko}</div>
+        <div>HP: ${card.hp}</div>
+        <div>LV: ${card.level}</div>
+      `;
       cardElement.dataset.hp = card.hp;
       cardElement.dataset.level = card.level;
       cardElement.dataset.serial = card.serial;
@@ -69,7 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const attackPower = parseInt(attacker.dataset.level, 10);
     const defenderHp = parseInt(defender.dataset.hp, 10) - attackPower;
     defender.dataset.hp = defenderHp;
-    defender.textContent = `${defender.textContent.split(' ')[0]} (HP: ${defenderHp}, LV: ${defender.dataset.level})`;
+    defender.innerHTML = `
+      <div>${defender.innerHTML.split('<div>')[0]}</div>
+      <div>HP: ${defenderHp}</div>
+      <div>LV: ${defender.dataset.level}</div>
+    `;
 
     if (defenderHp <= 0) {
       defender.parentNode.removeChild(defender);
@@ -113,7 +121,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
   player2BattleArea.appendChild(attackButton2);
-});
-
-  player2Deck.appendChild(drawButton2);
 });

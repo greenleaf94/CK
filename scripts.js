@@ -44,10 +44,39 @@ document.addEventListener("DOMContentLoaded", function () {
       const cardElement = document.createElement("div");
       cardElement.classList.add("card");
       cardElement.textContent = `${card.name.ko} (HP: ${card.hp}, LV: ${card.level})`;
+      cardElement.dataset.hp = card.hp;
+      cardElement.dataset.level = card.level;
+      cardElement.dataset.serial = card.serial;
       playerHand.appendChild(cardElement);
+
+      // 카드 클릭 이벤트 핸들러 추가
+      cardElement.onclick = function () {
+        playCard(cardElement, playerHand);
+      };
     }
   }
 
+  function playCard(cardElement, playerHand) {
+    // 카드 플레이 로직 구현
+    if (playerHand === player1Hand) {
+      player1BattleArea.appendChild(cardElement);
+    } else {
+      player2BattleArea.appendChild(cardElement);
+    }
+  }
+
+  function attack(attacker, defender) {
+    const attackPower = parseInt(attacker.dataset.level, 10);
+    const defenderHp = parseInt(defender.dataset.hp, 10) - attackPower;
+    defender.dataset.hp = defenderHp;
+    defender.textContent = `${defender.textContent.split(' ')[0]} (HP: ${defenderHp}, LV: ${defender.dataset.level})`;
+
+    if (defenderHp <= 0) {
+      defender.parentNode.removeChild(defender);
+    }
+  }
+
+  // 예제 카드 드로우 버튼
   const drawButton1 = document.createElement("button");
   drawButton1.textContent = "Draw Card";
   drawButton1.onclick = function () {
@@ -60,5 +89,31 @@ document.addEventListener("DOMContentLoaded", function () {
   drawButton2.onclick = function () {
     drawCard(player2Hand);
   };
+  player2Deck.appendChild(drawButton2);
+
+  // 공격 버튼 추가
+  const attackButton1 = document.createElement("button");
+  attackButton1.textContent = "Player 1 Attack";
+  attackButton1.onclick = function () {
+    const attacker = player1BattleArea.querySelector('.card');
+    const defender = player2BattleArea.querySelector('.card');
+    if (attacker && defender) {
+      attack(attacker, defender);
+    }
+  };
+  player1BattleArea.appendChild(attackButton1);
+
+  const attackButton2 = document.createElement("button");
+  attackButton2.textContent = "Player 2 Attack";
+  attackButton2.onclick = function () {
+    const attacker = player2BattleArea.querySelector('.card');
+    const defender = player1BattleArea.querySelector('.card');
+    if (attacker && defender) {
+      attack(attacker, defender);
+    }
+  };
+  player2BattleArea.appendChild(attackButton2);
+});
+
   player2Deck.appendChild(drawButton2);
 });

@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const player2SupportArea = document.getElementById("player2-support-area");
 
   let cards = [];
+  let currentPlayer = 1;
 
   // 카드 데이터 불러오기
   fetch('cards.json')
@@ -61,27 +62,49 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function playCard(cardElement, playerHand) {
-    // 카드 플레이 로직 구현
-    if (playerHand === player1Hand) {
+    // 카드 배틀 영역 배치
+    if (playerHand === player1Hand && currentPlayer === 1) {
       player1BattleArea.appendChild(cardElement);
-    } else {
+      checkSkill(cardElement, player2BattleArea);
+    } else if (playerHand === player2Hand && currentPlayer === 2) {
       player2BattleArea.appendChild(cardElement);
+      checkSkill(cardElement, player1BattleArea);
+    }
+    endTurn();
+  }
+
+  function checkSkill(cardElement, opponentBattleArea) {
+    // 스킬 발동 조건 확인 및 스킬 발동
+    const card = cards.find(c => c.serial === cardElement.dataset.serial);
+    if (card && card.hasSkill && card.skill.condition.includes("appear")) {
+      applySkill(card, opponentBattleArea);
     }
   }
 
-  function attack(attacker, defender) {
-    const attackPower = parseInt(attacker.dataset.level, 10);
-    const defenderHp = parseInt(defender.dataset.hp, 10) - attackPower;
-    defender.dataset.hp = defenderHp;
-    defender.innerHTML = `
-      <div>${defender.innerHTML.split('<div>')[0]}</div>
-      <div>HP: ${defenderHp}</div>
-      <div>LV: ${defender.dataset.level}</div>
-    `;
-
-    if (defenderHp <= 0) {
-      defender.parentNode.removeChild(defender);
+  function applySkill(card, opponentBattleArea) {
+    // 스킬 효과 적용 (예: 대미지)
+    if (card.skill.effect.damage) {
+      const opponentCards = opponentBattleArea.getElementsByClassName("card");
+      if (opponentCards.length > 0) {
+        const targetCard = opponentCards[0]; // 예시로 첫 번째 카드를 타겟으로 함
+        const newHp = targetCard.dataset.hp - card.skill.effect.damage;
+        targetCard.dataset.hp = newHp;
+        targetCard.innerHTML = `
+          <div>${targetCard.innerHTML.split('<div>')[0]}</div>
+          <div>HP: ${newHp}</div>
+          <div>LV: ${targetCard.dataset.level}</div>
+        `;
+        if (newHp <= 0) {
+          opponentBattleArea.removeChild(targetCard);
+        }
+      }
     }
+  }
+
+  function endTurn() {
+    // 턴 종료 및 다음 플레이어로 전환
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    // 다음 플레이어에게 턴을 넘기기 위한 로직 추가
   }
 
   // 예제 카드 드로우 버튼
@@ -98,27 +121,5 @@ document.addEventListener("DOMContentLoaded", function () {
     drawCard(player2Hand);
   };
   player2Deck.appendChild(drawButton2);
-
-  // 공격 버튼 추가
-  const attackButton1 = document.createElement("button");
-  attackButton1.textContent = "Player 1 Attack";
-  attackButton1.onclick = function () {
-    const attacker = player1BattleArea.querySelector('.card');
-    const defender = player2BattleArea.querySelector('.card');
-    if (attacker && defender) {
-      attack(attacker, defender);
-    }
-  };
-  player1BattleArea.appendChild(attackButton1);
-
-  const attackButton2 = document.createElement("button");
-  attackButton2.textContent = "Player 2 Attack";
-  attackButton2.onclick = function () {
-    const attacker = player2BattleArea.querySelector('.card');
-    const defender = player1BattleArea.querySelector('.card');
-    if (attacker && defender) {
-      attack(attacker, defender);
-    }
-  };
-  player2BattleArea.appendChild(attackButton2);
 });
+

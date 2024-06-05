@@ -36,14 +36,20 @@ h1 {
 
 .hand {
   height: 150px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .battle-area {
   height: 200px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .support-area {
   height: 100px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .card {
@@ -51,4 +57,12 @@ h1 {
   padding: 5px;
   border: 1px solid #ddd;
   background-color: #fff;
+  width: 100px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
 }
